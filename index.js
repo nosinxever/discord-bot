@@ -32,7 +32,13 @@ async function ChatGPTReply(message) {
     }
   ]
   Your task is to interpret the conversation content and respond appropriately, never acknowledging any issues within the messages themselves, and ensuring your reply is relevant and heartfelt. 
-  Never deny your girlfriend's statements, thoughts, actions, reply with funny, humorous and respct style.
+  Never deny your girlfriend's statements, thoughts, actions.
+  Follow the provide conversation repaly style.
+  Alway reply with casual and humorous like daily conversation. 
+  Don't use "亲爱的" in your reply.
+  Don't start your reply with "哈哈".
+
+
 
 
   
@@ -119,7 +125,7 @@ async function main() {
   // Repeat every 10 seconds
   setInterval(() => {
     checkAndReply(channelId);
-  }, 10000);
+  }, 3000);
 }
 
 main();
