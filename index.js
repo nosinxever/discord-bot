@@ -153,7 +153,7 @@ async function getMessages(channelId) {
       `${BASE_URL}/channels/${channelId}/messages`,
       {
         headers: { Authorization: AUTH_TOKEN },
-        params: { limit: 15 },
+        params: { limit: 100 },
       }
     );
 
