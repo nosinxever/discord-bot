@@ -102,23 +102,24 @@ async function getMessages(channelId) {
       `${BASE_URL}/channels/${channelId}/messages`,
       {
         headers: { Authorization: AUTH_TOKEN },
-        params: { limit: 100 },
+        params: { limit: 15 },
       }
     );
 
     const messages = response.data.map((item) => ({
-      // id: item.id,
       content: item.content,
+      //attachments: item.attachments.map(att => att.url || "No URL"), // This will create an array of URLs
       username: item.author.username,
-      timestamp: item.timestamp,
+      timestamp: new Date(item.timestamp).toLocaleString(),
     }));
-    // console.log(messages);
+
     return messages;
   } catch (error) {
-    console.error(error.response.data);
+    console.error(error.response ? error.response.data : error);
     return false;
   }
 }
+
 
 async function sendMessage(channelId, msg) {
   const now = new Date();
@@ -173,4 +174,3 @@ async function main() {
 }
 
 main();
-
