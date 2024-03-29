@@ -1,5 +1,6 @@
 const axios = require("axios");
 const OpenAI = require("openai");
+const Anthropic = require("@anthropic-ai/sdk");
 
 const { format } = require("date-fns");
 
@@ -8,8 +9,17 @@ require("dotenv").config();
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
+
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY
+});
+
+
 const AUTH_TOKEN = process.env.AUTH_TOKEN;
 const BASE_URL = "https://discord.com/api/v9";
+
+
+
 
 let lastTimestamp = null;
 
@@ -38,11 +48,6 @@ async function ChatGPTReply(message) {
   Don't use "亲爱的" in your reply.
   Don't start your reply with "哈哈".
 
-
-
-
-  
-
   ` + JSON.stringify(message);
 
   const completion = await openai.chat.completions.create({
@@ -53,13 +58,52 @@ async function ChatGPTReply(message) {
   return completion.choices[0].message.content;
 }
 
+
+
+async function ClaudeReply(message) {
+  const now = new Date();
+  const timestamp = format(now, "yyyy-MM-dd HH:mm:ss");
+
+  if (message[0].username === "evanlee01") {
+    return "";
+  }
+
+  prompt =`你扮演Evan Lee,是一位角色名为Shirdn的女友的男朋友。你需要用中文回复希尔丹发来的信息,采取亲密、体贴的语气,体现你们之间深厚的感情。回复应该简洁,不超过15个字。不需要在回复中提及你的名字。你会收到一个JavaScript对象,包含对话内容,需要根据内容构建回复。每次回复都基于最新的信息,根据时间戳确定。如果对话内容为空,给出温馨的问候语。不要重复或提及收到的信息中可能存在的问题。对话格式示例:
+  [
+    {
+      "content": "这是一条信息",  // 根据此内容回复
+      "username": "shirdn",  // 表示发送者,shirdn是你女友,evanlee是你自己
+      "timestamp": "2024-03-14T03:58:45.606000+00:00"  // 信息发送时间,回复最新的
+    }
+  ]
+
+  你需要解读对话内容,给出恰当、充满感情的回复。不要否认女友的言行。回复要随性、幽默,像日常对话。不要在回复中使用"亲爱的"或以"哈哈"开头。
+<conversation>
+
+  ` + JSON.stringify(message)+" </conversation>"+`  
+  回复文本的格式应该是纯文本,不需要构建JavaScript对象。以下是一个示例:
+  我今天过得很开心!
+
+  `;
+
+  const replyMessage = await anthropic.messages.create({
+    max_tokens: 1024,
+    messages: [{ role: 'user', content: prompt }],
+    model: 'claude-3-opus-20240229',
+  });
+
+  console.log(timestamp + " : ✅ " + replyMessage.content);
+
+  return replyMessage.content;
+}
+
 async function getMessages(channelId) {
   try {
     const response = await axios.get(
       `${BASE_URL}/channels/${channelId}/messages`,
       {
         headers: { Authorization: AUTH_TOKEN },
-        params: { limit: 10 },
+        params: { limit: 100 },
       }
     );
 
@@ -69,6 +113,7 @@ async function getMessages(channelId) {
       username: item.author.username,
       timestamp: item.timestamp,
     }));
+    // console.log(messages);
     return messages;
   } catch (error) {
     console.error(error.response.data);
@@ -114,8 +159,9 @@ async function checkAndReply(channelId) {
   // Update last known message timestamp
   lastTimestamp = messages[0].timestamp;
 
-  const replyMessage = await ChatGPTReply(messages);
-  await sendMessage(channelId, replyMessage);
+  const replyMessage = await ClaudeReply(messages);
+  console.log("replyMessage "+replyMessage)
+  // await sendMessage(channelId, replyMessage);
 }
 
 async function main() {
@@ -125,7 +171,8 @@ async function main() {
   // Repeat every 10 seconds
   setInterval(() => {
     checkAndReply(channelId);
-  }, 3000);
+  }, 10000);
 }
 
 main();
+
