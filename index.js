@@ -80,10 +80,9 @@ async function ClaudeReply(message) {
   你需要解读对话内容,给出恰当、充满感情的回复。不要否认女友的言行。回复要随性、幽默,像日常对话。不要在回复中使用"亲爱的"或以"哈哈"开头。
 <conversation>
 
-  ` + JSON.stringify(message)+" </conversation>"+`  
-  回复文本的格式应该是纯文本,不需要构建JavaScript对象。以下是一个示例:
-  我今天过得很开心!
-
+  ` + JSON.stringify(message)+" </conversation>"+` 
+   
+  回复文本的格式应该是纯文本,不需要构建JavaScript对象。
   `;
 
   const replyMessage = await anthropic.messages.create({
@@ -92,9 +91,9 @@ async function ClaudeReply(message) {
     model: 'claude-3-opus-20240229',
   });
 
-  console.log(timestamp + " : ✅ " + replyMessage.content);
+  console.log(timestamp + " : ✅ " + replyMessage.content[0].text);
 
-  return replyMessage.content;
+  return replyMessage.content[0].text;
 }
 
 async function getMessages(channelId) {
@@ -160,7 +159,6 @@ async function checkAndReply(channelId) {
   lastTimestamp = messages[0].timestamp;
 
   const replyMessage = await ClaudeReply(messages);
-  console.log("replyMessage "+replyMessage)
   // await sendMessage(channelId, replyMessage);
 }
 
