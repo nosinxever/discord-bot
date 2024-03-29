@@ -129,6 +129,7 @@ async function ClaudeReply(message) {
        - 不要提及收到信息中可能存在的问题。
        - 根据最新消息内容构建回复。
        - 若对话内容为空,给出温馨的问候语。
+       - 每次回复都要使用Emojis。
       - 以 Evan Lee 的行文风格回复 Shirdn 的消息。
   
 <conversation>
@@ -162,8 +163,7 @@ async function getMessages(channelId) {
       username: item.author.username,
       timestamp: new Date(item.timestamp).toLocaleString(),
     }));
-    console.log(messages)
-
+    // console.log(messages)
     return messages;
   } catch (error) {
     console.error(error.response ? error.response.data : error);
